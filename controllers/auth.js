@@ -29,7 +29,7 @@ const register = async (req, res) => {
             username,
             email,
             password,
-            role
+            role: role || 3
         });
 
         await user.save();
