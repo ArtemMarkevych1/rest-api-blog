@@ -36,6 +36,7 @@ const register = async (req, res) => {
 
         res.status(201).json({
             success: true,
+            code: 201,
             message: "User registered successfully",
             data: {
                 username: user.username,
