@@ -5,6 +5,7 @@ const connectDB = require('./init/mongodb');
 const authRoutes = require('./routes');
 const morgan = require('morgan');
 const { errorHandler } = require('./middlewares');
+const notFound = require('./controllers/notFound');
 
 const app = express();
 
@@ -28,5 +29,6 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/v1/auth', authRoutes);
+app.use("*", notFound);
 
 module.exports = app;
