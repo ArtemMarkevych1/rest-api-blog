@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const hashPassword = require('../utils/hashPassword');
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -24,28 +23,20 @@ const userSchema = new mongoose.Schema({
         enum: [1, 2, 3],
         default: 3,
         required: true
-    }
+    },
+    verificationCode: {
+        type: String,
+    },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    forgotPasswordCode: {
+        type: String,
+    },
 }, {
     timestamps: true
 });
-
-// Hash password before saving
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
-
-    try {
-        const salt = await hashPassword(this.password);
-        this.password = salt;
-        next();
-    } catch (error) {
-        next(error);
-    }
-});
-
-// Method to compare passwords
-userSchema.methods.comparePassword = async function (candidatePassword) {
-    return await comparePasswords(candidatePassword, this.password);
-};
 
 module.exports = mongoose.model('User', userSchema);
 

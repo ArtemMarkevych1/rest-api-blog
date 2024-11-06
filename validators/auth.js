@@ -27,7 +27,43 @@ const loginValidator = [
         .notEmpty().withMessage('Password is required')
 ];
 
+const verifyEmailValidator = [
+    check('email')
+        .trim()
+        .notEmpty().withMessage('Email is required')
+        .isEmail().withMessage('Invalid email format')
+        .normalizeEmail()
+];
+
+const verifyUserValidator = [
+    check('email')
+        .trim()
+        .notEmpty().withMessage('Email is required')
+        .isEmail().withMessage('Invalid email format')
+        .normalizeEmail(),
+    check('code')
+        .trim()
+        .notEmpty().withMessage('Code is required')
+];
+
+const recoverPasswordValidator = [
+    check('email')
+        .trim()
+        .notEmpty().withMessage('Email is required')
+        .isEmail().withMessage('Invalid email format')
+        .normalizeEmail(),
+    check('code')
+        .trim()
+        .notEmpty().withMessage('Code is required'),
+    check('password')
+        .trim()
+        .notEmpty().withMessage('Password is required')
+];
+
 module.exports = {
     signupValidator,
-    loginValidator
+    loginValidator,
+    verifyEmailValidator,
+    verifyUserValidator,
+    recoverPasswordValidator
 };
