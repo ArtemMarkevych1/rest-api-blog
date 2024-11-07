@@ -206,11 +206,47 @@ const recoverPassword = async (req, res, next) => {
     }
 }
 
+const changePassword = async (req, res, next) => {
+
+    try {
+        const { oldPassword, newPassword } = req.body;
+        const { email } = req.user;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        const isSamePassword = await comparePasswords(newPassword, user.password);
+        if (isSamePassword) {
+            return res.status(400).json({
+                success: false,
+                message: "New password cannot be the same as your old password"
+            });
+        }
+
+        const hashedPassword = await hashPassword(newPassword);
+        user.password = hashedPassword;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Password changed successfully"
+        });
+        console.log(user);
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     register,
     login,
     verifyEmail,
     verifyUser,
     forgotPassword,
-    recoverPassword
+    recoverPassword,
+    changePassword
 };

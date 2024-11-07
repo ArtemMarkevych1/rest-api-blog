@@ -1,4 +1,4 @@
-const { signupValidator, loginValidator, verifyEmailValidator, verifyUserValidator, recoverPasswordValidator } = require('./auth');
+const { signupValidator, loginValidator, verifyEmailValidator, verifyUserValidator, recoverPasswordValidator, changePasswordValidator } = require('./auth');
 const { validateResult } = require('./validate');
 
 module.exports = {
@@ -7,5 +7,6 @@ module.exports = {
     validateResult,
     verifyEmailValidator,
     verifyUserValidator,
-    recoverPasswordValidator
+    recoverPasswordValidator,
+    changePasswordValidator
 };
