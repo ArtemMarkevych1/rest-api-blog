@@ -252,16 +252,39 @@ const changePassword = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
     try {
         const { userId } = req.user;
-        const { name, email } = req.body;
-        const user = await User.findById(userId);
+        const { username, email } = req.body;
+        const user = await User.findById(userId)
+            .select('-password -verificationCode -forgotPasswordCode -isVerified');
+
         if (!user) {
             return res.status(404).json({
                 success: false,
                 message: "User not found"
             });
         }
-        user.username = name ? name : user.username;
+        user.username = username ? username : user.username;
         user.email = email ? email : user.email;
+
+        if (email) {
+            const isEmailExist = await User.findOne({ email });
+            if (isEmailExist) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Email already exists"
+                });
+            }
+        }
+
+        if (username) {
+            const isUsernameExist = await User.findOne({ username });
+            if (isUsernameExist) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Username already exists"
+                });
+            }
+        }
+
         await user.save();
 
         res.status(200).json({
