@@ -71,10 +71,14 @@ const changePasswordValidator = [
 ];
 
 const updateUserValidator = [
-    check('email').custom(validateEmail),
-    // check('username')
-    //     .trim()
-    //     .notEmpty().withMessage('Username is required')
+    check('email').custom(async (email) => {
+        if (email) {
+            const isEmailValid = await validateEmail(email);
+            if (!isEmailValid) {
+                throw new Error('Invalid email format');
+            }
+        }
+    }),
 ];
 
 module.exports = {

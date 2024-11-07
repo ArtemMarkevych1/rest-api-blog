@@ -210,8 +210,8 @@ const changePassword = async (req, res, next) => {
 
     try {
         const { oldPassword, newPassword } = req.body;
-        const { email } = req.user;
-        const user = await User.findOne({ email });
+        const { userId } = req.user;
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -251,9 +251,9 @@ const changePassword = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
     try {
-        const { email: userEmail } = req.user;
+        const { userId } = req.user;
         const { name, email } = req.body;
-        const user = await User.findOne({email: userEmail});
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -267,15 +267,6 @@ const updateUser = async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: "User updated successfully"
-        });
-
-        // login again
-        // todo implement refresh token login
-        const token = await generateToken(user._id, user.username, user.email);
-        res.status(200).json({
-            success: true,
-            message: "Login successful",
-            token
         });
     } catch (error) {
         next(error);
