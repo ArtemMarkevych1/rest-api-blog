@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDB = require('./init/mongodb');
-const authRoutes = require('./routes');
+const { authRoutes, categoryRoutes } = require('./routes');
 const morgan = require('morgan');
 const { errorHandler } = require('./middlewares');
 const notFound = require('./controllers/notFound');
@@ -30,6 +30,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/category', categoryRoutes);
 app.use("*", notFound);
 
 module.exports = app;

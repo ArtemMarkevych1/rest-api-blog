@@ -1,5 +1,6 @@
-const User = require('./user');
-
+const User = require('./User');
+const Category = require('./Category');
 module.exports = {
-    User
+    User,
+    Category
 };
