@@ -268,6 +268,15 @@ const updateUser = async (req, res, next) => {
             success: true,
             message: "User updated successfully"
         });
+
+        // login again
+        // todo implement refresh token login
+        const token = await generateToken(user._id, user.username, user.email);
+        res.status(200).json({
+            success: true,
+            message: "Login successful",
+            token
+        });
     } catch (error) {
         next(error);
     }
