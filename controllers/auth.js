@@ -219,6 +219,14 @@ const changePassword = async (req, res, next) => {
             });
         }
 
+        const isWrongOldPassword = await comparePasswords(oldPassword, user.password);
+        if (!isWrongOldPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid old password"
+            });
+        }
+
         const isSamePassword = await comparePasswords(newPassword, user.password);
         if (isSamePassword) {
             return res.status(400).json({
@@ -241,6 +249,30 @@ const changePassword = async (req, res, next) => {
     }
 }
 
+const updateUser = async (req, res, next) => {
+    try {
+        const { email: userEmail } = req.user;
+        const { name, email } = req.body;
+        const user = await User.findOne({email: userEmail});
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+        user.username = name ? name : user.username;
+        user.email = email ? email : user.email;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "User updated successfully"
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     register,
     login,
@@ -248,5 +280,6 @@ module.exports = {
     verifyUser,
     forgotPassword,
     recoverPassword,
-    changePassword
+    changePassword,
+    updateUser
 };

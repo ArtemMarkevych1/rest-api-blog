@@ -1,4 +1,5 @@
 const { check } = require('express-validator');
+const validateEmail = require('./validateEmail');
 
 const signupValidator = [
     check('email')
@@ -69,11 +70,19 @@ const changePasswordValidator = [
         .notEmpty().withMessage('New password is required')
 ];
 
+const updateUserValidator = [
+    check('email').custom(validateEmail),
+    // check('username')
+    //     .trim()
+    //     .notEmpty().withMessage('Username is required')
+];
+
 module.exports = {
     signupValidator,
     loginValidator,
     verifyEmailValidator,
     verifyUserValidator,
     recoverPasswordValidator,
-    changePasswordValidator
+    changePasswordValidator,
+    updateUserValidator
 };
