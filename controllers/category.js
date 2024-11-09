@@ -4,23 +4,43 @@ const User = require('../models/User');
 const getAllCategories = async (req, res, next) => {
     try {
         const searchQuery = req.query.q;
-        let categories;
+        const page = parseInt(req.query.page) || 1;  // Default to page 1
+        const size = parseInt(req.query.size) || 10; // Default to 10 items per page
         
+        // Calculate skip value for pagination
+        const skip = (page - 1) * size;
+        
+        let query = {};
         if (searchQuery && typeof searchQuery === 'string') {
-            categories = await Category.find({
+            query = {
                 $or: [
                     { title: { $regex: searchQuery, $options: 'i' } },
                     { description: { $regex: searchQuery, $options: 'i' } }
                 ]
-            });
-        } else {
-            categories = await Category.find();
+            };
         }
+        
+        // Get total count for pagination
+        const totalCount = await Category.countDocuments(query);
+        const totalPages = Math.ceil(totalCount / size);
+        
+        // Get paginated results
+        const categories = await Category.find(query)
+            .skip(skip)
+            .limit(size)
+            .sort({ createdAt: -1 });  // Sort by newest first
         
         res.status(200).json({
             success: true,
             message: categories.length > 0 ? "Categories fetched successfully" : "No categories found",
-            count: categories.length,
+            pagination: {
+                total: totalCount,
+                totalPages,
+                currentPage: page,
+                pageSize: size,
+                hasNext: page < totalPages,
+                hasPrev: page > 1
+            },
             categories
         });
     } catch (error) {

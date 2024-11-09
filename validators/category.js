@@ -13,7 +13,19 @@ const idValidator = [
     })
 ];
 
+const paginationValidator = [
+    check('page')
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage('Page must be a positive integer'),
+    check('size')
+        .optional()
+        .isInt({ min: 1, max: 100 })
+        .withMessage('Size must be between 1 and 100')
+];
+
 module.exports = {
     createCategoryValidator,
-    idValidator
+    idValidator,
+    paginationValidator
 };
