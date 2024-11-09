@@ -3,10 +3,24 @@ const User = require('../models/User');
 
 const getAllCategories = async (req, res, next) => {
     try {
-        const categories = await Category.find();
+        const searchQuery = req.query.q;
+        let categories;
+        
+        if (searchQuery && typeof searchQuery === 'string') {
+            categories = await Category.find({
+                $or: [
+                    { title: { $regex: searchQuery, $options: 'i' } },
+                    { description: { $regex: searchQuery, $options: 'i' } }
+                ]
+            });
+        } else {
+            categories = await Category.find();
+        }
+        
         res.status(200).json({
             success: true,
-            message: "Categories fetched successfully",
+            message: categories.length > 0 ? "Categories fetched successfully" : "No categories found",
+            count: categories.length,
             categories
         });
     } catch (error) {
@@ -28,35 +42,6 @@ const getCategoryById = async (req, res, next) => {
             success: true,
             message: "Category fetched successfully",
             category
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-
-const searchCategoryByContent = async (req, res, next) => {
-    try {
-        const searchQuery = req.query.q;
-        
-        if (!searchQuery || typeof searchQuery !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: "Search query is required and must be a string"
-            });
-        }
-        
-        const categories = await Category.find({
-            $or: [
-                { title: { $regex: searchQuery, $options: 'i' } },
-                { description: { $regex: searchQuery, $options: 'i' } }
-            ]
-        });
-        
-        res.status(200).json({
-            success: true,
-            message: categories.length > 0 ? "Categories found" : "No categories found",
-            count: categories.length,
-            categories
         });
     } catch (error) {
         next(error);
@@ -142,6 +127,5 @@ module.exports = {
     updateCategory,
     deleteCategory,
     getAllCategories,
-    getCategoryById,
-    searchCategoryByContent
+    getCategoryById
 };
