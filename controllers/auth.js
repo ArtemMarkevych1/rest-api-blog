@@ -65,7 +65,7 @@ const login = async (req, res, next) => {
             });
         }
 
-        const token = await generateToken(user._id, user.username, user.email);
+        const token = await generateToken(user);
 
         res.status(200).json({
             success: true,
@@ -286,6 +286,13 @@ const updateUser = async (req, res, next) => {
         }
 
         await user.save();
+
+        // const token = await generateToken(user._id, user.username, user.email);
+        // res.status(200).json({
+        //     success: true,
+        //     message: "User updated successfully",
+        //     token
+        // });
 
         res.status(200).json({
             success: true,

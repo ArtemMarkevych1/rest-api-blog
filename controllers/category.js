@@ -12,7 +12,6 @@ const createCategory = async (req, res, next) => {
                 message: "Category already exists"
             });
         }
-        const category = await Category.create({ title, description, updatedBy: userId });
         const user = await User.findById(userId);
         if (!user) {
             res.status(404).json({
