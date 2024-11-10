@@ -2,10 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDB = require('./init/mongodb');
-const { authRoutes, categoryRoutes } = require('./routes');
+const { authRoutes, categoryRoutes, fileRoutes } = require('./routes');
 const morgan = require('morgan');
 const { errorHandler } = require('./middlewares');
 const notFound = require('./controllers/notFound');
+const path = require('path');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(express.json({
 }));
 app.use(morgan('dev'));
 app.use(errorHandler);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Basic route
 app.get('/', (req, res) => {
@@ -31,6 +33,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/category', categoryRoutes);
+app.use('/api/v1/file', fileRoutes);
 app.use("*", notFound);
 
 module.exports = app;
