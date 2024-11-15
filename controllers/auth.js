@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User, File } = require('../models');
 const generateToken = require('../utils/generateToken');
 const comparePasswords = require('../utils/comparePasswords');
 const generateCode = require('../utils/generateCode');
@@ -252,7 +252,7 @@ const changePassword = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
     try {
         const { userId } = req.user;
-        const { username, email } = req.body;
+        const { username, email, profilePicture } = req.body;
         const user = await User.findById(userId)
             .select('-password -verificationCode -forgotPasswordCode -isVerified');
 
@@ -264,6 +264,14 @@ const updateUser = async (req, res, next) => {
         }
         user.username = username ? username : user.username;
         user.email = email ? email : user.email;
+        user.profilePicture = profilePicture ? profilePicture : user.profilePicture;
+
+        if (!email && !username && !profilePicture) {
+            return res.status(400).json({
+                success: false,
+                message: "No fields to update"
+            });
+        }
 
         if (email) {
             const isEmailExist = await User.findOne({ email });
@@ -285,18 +293,46 @@ const updateUser = async (req, res, next) => {
             }
         }
 
-        await user.save();
+        if (profilePicture) {
+            const isFileExist = await File.findById(profilePicture);
+            if (!isFileExist) {
+                return res.status(404).json({
+                    success: false,
+                    message: "File not found"
+                });
+            }
+        }
 
-        // const token = await generateToken(user._id, user.username, user.email);
-        // res.status(200).json({
-        //     success: true,
-        //     message: "User updated successfully",
-        //     token
-        // });
+        await user.save();
 
         res.status(200).json({
             success: true,
             message: "User updated successfully"
+        });
+    } catch (error) {
+        console.log("---suka");
+        next(error);
+    }
+}
+
+const getCurrentUser = async (req, res, next) => {
+    try {
+        const { userId } = req.user;
+        const user = await User.findById(userId)
+            .select('-password -verificationCode -forgotPasswordCode -isVerified')
+            .populate('profilePicture');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "User fetched successfully",
+            data: user
         });
     } catch (error) {
         next(error);
@@ -311,5 +347,6 @@ module.exports = {
     forgotPassword,
     recoverPassword,
     changePassword,
-    updateUser
+    updateUser,
+    getCurrentUser
 };

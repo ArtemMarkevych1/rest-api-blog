@@ -1,5 +1,7 @@
 const { check } = require('express-validator');
 const validateEmail = require('./validateEmail');
+const mongoose = require('mongoose');
+const File = require('../models/File');
 
 const signupValidator = [
     check('email')
@@ -79,6 +81,18 @@ const updateUserValidator = [
             }
         }
     }),
+    check('profilePicture')
+        .custom(async (profilePicture) => {
+            if (profilePicture && !mongoose.Types.ObjectId.isValid(profilePicture)) {
+                throw new Error('Invalid file ID');
+            }
+            if (profilePicture && mongoose.Types.ObjectId.isValid(profilePicture)) {
+                const isFileExist = await File.findById(profilePicture);
+                if (!isFileExist) {
+                    throw new Error('File not found');
+                }
+            }
+        })
 ];
 
 module.exports = {

@@ -14,6 +14,11 @@ const userSchema = new mongoose.Schema({
         trim: true,
         lowercase: true
     },
+    profilePicture: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'File',
+        default: null
+    },
     password: {
         type: String,
         required: true
